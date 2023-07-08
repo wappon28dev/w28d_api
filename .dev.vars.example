@@ -1,0 +1,5 @@
+HOST_URL = "xxxxxxxxxxxxxxxxx"
+CLIENT_ID = "xxxxxxxxxxxxxxxxx"
+CLIENT_SECRET = "xxxxxxxxxxxxxxxxx"
+TENANT_ID = "xxxxxxxxxxxxxxxxx"
+DRIVE_ID = "xxxxxxxxxxxxxxxxx"

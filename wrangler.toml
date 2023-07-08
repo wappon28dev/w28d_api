@@ -1,0 +1,7 @@
+name = "assets_center_server"
+main = "src/index.ts"
+compatibility_date = "2023-06-28"
+
+kv_namespaces = [
+  { binding = "ASSETS_CENTER_ACCESS_DATA", id = "d6af6e43f8d241658d0017d8b3db9cd4", preview_id = "36739cdcc46c47d99f6c6e59d517cf48" },
+]
