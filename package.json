@@ -1,5 +1,5 @@
 {
-  "name": "@assets_center/server",
+  "name": "w28d_api",
   "version": "0.0.0",
   "private": true,
   "type": "module",

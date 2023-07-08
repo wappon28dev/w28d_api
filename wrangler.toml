@@ -1,4 +1,4 @@
-name = "assets_center_server"
+name = "w28d_api"
 main = "src/index.ts"
 compatibility_date = "2023-06-28"
 

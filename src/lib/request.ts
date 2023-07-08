@@ -12,7 +12,7 @@ export async function fetchRequest<T>(
 
   if (!res.ok) {
     console.error(res);
-    throw new ResponseNotOkError(errMessage, await res.json());
+    throw new ResponseNotOkError(errMessage, await res.json(), res.status);
   }
 
   return (await res.json()) as T;
