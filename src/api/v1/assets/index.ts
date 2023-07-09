@@ -12,11 +12,13 @@ export const assets = createHono()
     await next();
   })
 
-  .use("/*", async (ctx, next) =>
-    await cors({
-      origin: ctx.env.ALLOW_HOST_LIST.split(","),
-      exposeHeaders: ["GET"],
-    })(ctx, next)
+  .use(
+    "/*",
+    async (ctx, next) =>
+      await cors({
+        origin: ctx.env.ALLOW_HOST_LIST.split(","),
+        exposeHeaders: ["GET"],
+      })(ctx, next)
   )
 
   .route("/public", publicRouter)

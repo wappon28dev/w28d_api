@@ -75,4 +75,25 @@ export class Drive {
       "driveItem request failed"
     );
   }
+
+  public async getMeta(
+    fileOrDirPath: string
+  ): Promise<z.infer<(typeof resValidator)["listItem"]>> {
+    const endpoint = getApiEndpoint(
+      `/drives/${this.id}/root:/${fileOrDirPath}:/listItem`
+    );
+    return await fetchRequest(
+      [
+        endpoint,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.accessToken}`,
+          },
+        },
+      ],
+      "listItem request failed"
+    );
+  }
 }
