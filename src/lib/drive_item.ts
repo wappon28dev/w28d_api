@@ -35,10 +35,10 @@ export class Drive {
   }
 
   public async getChildren(
-    filePath: string
+    dirPath: string
   ): Promise<z.infer<(typeof resValidator)["driveChildren"]>> {
     const endpoint = getApiEndpoint(
-      `/drives/${this.id}/root:/${filePath}:/children`
+      `/drives/${this.id}/root:/${dirPath}:/children`
     );
 
     return await fetchRequest(

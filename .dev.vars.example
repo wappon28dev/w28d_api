@@ -1,3 +1,4 @@
+ALLOW_HOST_LIST = "xxxxxxxxxxxxxxxxx"
 CLIENT_ID = "xxxxxxxxxxxxxxxxx"
 CLIENT_SECRET = "xxxxxxxxxxxxxxxxx"
 TENANT_ID = "xxxxxxxxxxxxxxxxx"

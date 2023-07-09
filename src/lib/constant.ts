@@ -3,6 +3,7 @@ import { type z } from "zod";
 
 export type ENV = {
   ASSETS_CENTER_ACCESS_DATA: KVNamespace;
+  ALLOW_HOST_LIST: string;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
   TENANT_ID: string;

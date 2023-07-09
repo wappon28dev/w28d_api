@@ -1,18 +1,24 @@
+import { zValidator } from "@hono/zod-validator";
 import { createHono } from "lib/constant";
 import { Drive, driveErrHandler } from "lib/drive_item";
-import { resValidator } from "lib/types/res_req";
+import { z } from "zod";
 
 export const protectedRouter = createHono().get(
-  "/:filepath{.+\\..+$}",
+  "/item",
+  zValidator(
+    "query",
+    z.object({
+      filePath: z.string(),
+    })
+  ),
   async (ctx) => {
     const accessToken = ctx.get("accessToken");
-    const path = ctx.req.param("filepath");
-
+    const { filePath } = ctx.req.valid("query");
     const drive = new Drive("PROTECTED", accessToken);
 
     try {
-      const res = await drive.getItem(path);
-      return ctx.jsonT(resValidator.driveItem.parse(res));
+      const res = await drive.getItem(filePath);
+      return ctx.jsonT(res);
     } catch (err) {
       return driveErrHandler(err);
     }
