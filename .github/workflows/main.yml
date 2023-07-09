@@ -33,10 +33,12 @@ jobs:
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           secrets: |
+            ALLOW_HOST_LIST
             CLIENT_ID
             CLIENT_SECRET
             TENANT_ID
         env:
+          ALLOW_HOST_LIST: ${{ secrets.ALLOW_HOST_LIST }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           TENANT_ID: ${{ secrets.TENANT_ID }}
