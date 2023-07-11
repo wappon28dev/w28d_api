@@ -34,6 +34,28 @@ export class Drive {
     this.id = DRIVE_ID[key];
   }
 
+  public async getItem(
+    fileOrDirPath: string
+  ): Promise<z.infer<(typeof resValidator)["listItem"]>> {
+    const endpoint = getApiEndpoint(
+      `/drives/${this.id}/root:/${fileOrDirPath}:/listItem?expand=driveItem`
+    );
+
+    return await fetchRequest(
+      [
+        endpoint,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${this.accessToken}`,
+          },
+        },
+      ],
+      "driveItem request failed"
+    );
+  }
+
   public async getChildren(
     dirPath: string
   ): Promise<z.infer<(typeof resValidator)["driveChildren"]>> {
@@ -53,47 +75,6 @@ export class Drive {
         },
       ],
       "driveChildren request failed"
-    );
-  }
-
-  public async getItem(
-    filePath: string
-  ): Promise<z.infer<(typeof resValidator)["driveItem"]>> {
-    const endpoint = getApiEndpoint(`/drives/${this.id}/root:/${filePath}:/`);
-
-    return await fetchRequest(
-      [
-        endpoint,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${this.accessToken}`,
-          },
-        },
-      ],
-      "driveItem request failed"
-    );
-  }
-
-  public async getMeta(
-    fileOrDirPath: string
-  ): Promise<z.infer<(typeof resValidator)["listItem"]>> {
-    const endpoint = getApiEndpoint(
-      `/drives/${this.id}/root:/${fileOrDirPath}:/listItem`
-    );
-    return await fetchRequest(
-      [
-        endpoint,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${this.accessToken}`,
-          },
-        },
-      ],
-      "listItem request failed"
     );
   }
 }

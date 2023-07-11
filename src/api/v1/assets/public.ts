@@ -19,11 +19,8 @@ export const publicRouter = createHono()
       const drive = new Drive("PUBLIC", accessToken);
 
       try {
-        const [item, meta] = await Promise.all([
-          drive.getItem(filePath),
-          drive.getMeta(filePath),
-        ]);
-        return ctx.jsonT({ item, meta });
+        const item = await drive.getItem(filePath);
+        return ctx.jsonT({ item });
       } catch (err) {
         return driveErrHandler(err);
       }
@@ -44,11 +41,11 @@ export const publicRouter = createHono()
       const drive = new Drive("PUBLIC", accessToken);
 
       try {
-        const [children, meta] = await Promise.all([
+        const [item, children] = await Promise.all([
+          drive.getItem(dirPath),
           drive.getChildren(dirPath),
-          drive.getMeta(dirPath),
         ]);
-        return ctx.jsonT({ children, meta });
+        return ctx.jsonT({ item, children });
       } catch (err) {
         return driveErrHandler(err);
       }
