@@ -4,8 +4,8 @@ import { fetchRequest } from "./request";
 import { type resValidator } from "./types/res_req";
 
 const DRIVE_ID = {
-  PUBLIC: "b!QRbp9KMYTEiPf6Lw5ClXeKTxpF3W6gFNmzyqrgNi3b3lP-XJJdw6TYnw6uhG4aYW",
-  PROTECTED:
+  public: "b!QRbp9KMYTEiPf6Lw5ClXeKTxpF3W6gFNmzyqrgNi3b3lP-XJJdw6TYnw6uhG4aYW",
+  protected:
     "b!QRbp9KMYTEiPf6Lw5ClXeKTxpF3W6gFNmzyqrgNi3b3PaeLCjd8rQZo0XY_IkXpN",
 };
 
