@@ -7,6 +7,8 @@ export type ENV = {
   CLIENT_ID: string;
   CLIENT_SECRET: string;
   TENANT_ID: string;
+  DRIVE_ID_PUBLIC: string;
+  DRIVE_ID_PROTECTED: string;
 };
 
 export type Variables = {

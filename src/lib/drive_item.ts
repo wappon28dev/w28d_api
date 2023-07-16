@@ -1,13 +1,15 @@
 import { type z } from "zod";
-import { ResponseNotOkError, getApiEndpoint, type valueOf } from "./constant";
+import { ResponseNotOkError, getApiEndpoint, type ENV, type valueOf } from "./constant";
 import { fetchRequest } from "./request";
 import { type resValidator } from "./types/res_req";
 
-const DRIVE_ID = {
-  public: "b!QRbp9KMYTEiPf6Lw5ClXeKTxpF3W6gFNmzyqrgNi3b3lP-XJJdw6TYnw6uhG4aYW",
-  protected:
-    "b!QRbp9KMYTEiPf6Lw5ClXeKTxpF3W6gFNmzyqrgNi3b3PaeLCjd8rQZo0XY_IkXpN",
-};
+const getDriveId = (env: ENV): {
+  public: string;
+  protected: string;
+} => ({
+  public: env.DRIVE_ID_PUBLIC,
+  protected: env.DRIVE_ID_PROTECTED
+});
 
 export function driveErrHandler(err: unknown): Response {
   if (err instanceof Error) {
@@ -25,13 +27,14 @@ export function driveErrHandler(err: unknown): Response {
 }
 
 export class Drive {
-  private readonly id: valueOf<typeof DRIVE_ID>;
+  private readonly id: valueOf<ReturnType<typeof getDriveId>>;
 
   constructor(
-    public key: keyof typeof DRIVE_ID,
-    private readonly accessToken: string
+    public key: keyof ReturnType<typeof getDriveId>,
+    private readonly accessToken: string,
+    env: ENV
   ) {
-    this.id = DRIVE_ID[key];
+    this.id = getDriveId(env)[key];
   }
 
   public async getItem(
