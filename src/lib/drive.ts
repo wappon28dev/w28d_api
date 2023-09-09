@@ -1,18 +1,9 @@
 import { type z } from "zod";
-import { getApiEndpoint, type ENV, type ValueOf } from "./constant";
+import { getApiEndpoint } from "./constant";
 import { fetchRequest } from "./request";
 import { type resValidator } from "./types/res_req";
 import { ResponseNotOkError } from "./error";
-
-const getDriveId = (
-  env: ENV
-): {
-  public: string;
-  protected: string;
-} => ({
-  public: env.DRIVE_ID_PUBLIC,
-  protected: env.DRIVE_ID_PROTECTED,
-});
+import { type AssetManifests } from "./types/assets";
 
 export function driveErrHandler(err: unknown): Response {
   if (err instanceof Error) {
@@ -30,24 +21,28 @@ export function driveErrHandler(err: unknown): Response {
 }
 
 export class Drive {
-  private readonly id: ValueOf<ReturnType<typeof getDriveId>>;
-
   constructor(
-    public key: keyof ReturnType<typeof getDriveId>,
     private readonly accessToken: string,
-    env: ENV
-  ) {
-    this.id = getDriveId(env)[key];
-  }
+    private readonly manifest: AssetManifests[string]
+  ) {}
 
   public async getItem(
     fileOrDirPath: string
   ): Promise<z.infer<(typeof resValidator)["listItem"]>> {
-    const endpoint = getApiEndpoint(
-      `/drives/${this.id}/root:/${fileOrDirPath}:/listItem?expand=driveItem`
-    );
+    const distFileOrDirPath = [
+      ...this.manifest.distPath,
+      ...fileOrDirPath.split("/"),
+    ].join("/");
 
-    return fetchRequest(
+    const endpoint = getApiEndpoint([
+      "drives",
+      this.manifest.driveId,
+      "root:",
+      `${distFileOrDirPath}:`,
+      "listItem?expand=driveItem",
+    ]);
+
+    return await fetchRequest(
       [
         endpoint,
         {
@@ -65,11 +60,19 @@ export class Drive {
   public async getChildren(
     dirPath: string
   ): Promise<z.infer<(typeof resValidator)["driveChildren"]>> {
-    const endpoint = getApiEndpoint(
-      `/drives/${this.id}/root:/${dirPath}:/children`
+    const distDirPath = [...this.manifest.distPath, ...dirPath.split("/")].join(
+      "/"
     );
 
-    return fetchRequest(
+    const endpoint = getApiEndpoint([
+      "drives",
+      this.manifest.driveId,
+      "root:",
+      `${distDirPath}:`,
+      "children",
+    ]);
+
+    return await fetchRequest(
       [
         endpoint,
         {

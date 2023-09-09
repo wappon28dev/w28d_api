@@ -1,18 +1,18 @@
 import { Hono } from "hono";
 import { type z } from "zod";
+import { assetManifestsScheme, type AssetManifests } from "./types/assets";
 
 export type ENV = {
-  ASSETS_CENTER_ACCESS_DATA: KVNamespace;
-  ALLOW_HOST_LIST: string;
+  SHAREPOINT_ACCESS_TOKEN: KVNamespace;
   CLIENT_ID: string;
   CLIENT_SECRET: string;
   TENANT_ID: string;
-  DRIVE_ID_PUBLIC: string;
-  DRIVE_ID_PROTECTED: string;
+  ASSETS_MANIFESTS: string;
 };
 
 export type Variables = {
   accessToken: string;
+  assetManifest: AssetManifests[string];
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,5 +27,8 @@ export function createHono() {
   return new Hono<{ Bindings: ENV; Variables: Variables }>();
 }
 
-export const getApiEndpoint = (path: string): string =>
-  `https://graph.microsoft.com/v1.0${path}`;
+export const getApiEndpoint = (path: string[]): string =>
+  new URL(`https://graph.microsoft.com/v1.0/${path.join("/")}`).toString();
+
+export const getAssetManifests = (env: ENV): AssetManifests =>
+  assetManifestsScheme.parse(JSON.parse(env.ASSETS_MANIFESTS));

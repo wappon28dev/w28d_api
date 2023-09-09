@@ -17,7 +17,7 @@ export async function requestAccessToken(
     client_secret: env.CLIENT_SECRET,
   };
 
-  return fetchRequest(
+  return await fetchRequest(
     [
       tokenEndpoint,
       {
@@ -33,7 +33,7 @@ export async function requestAccessToken(
 }
 
 export async function getOrRefreshCredential(env: ENV): Promise<string> {
-  const accessTokenKV = new KV(env.ASSETS_CENTER_ACCESS_DATA, "accessToken");
+  const accessTokenKV = new KV(env.SHAREPOINT_ACCESS_TOKEN, "accessToken");
 
   let accessToken = await accessTokenKV.get();
 

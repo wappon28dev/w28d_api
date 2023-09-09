@@ -1,4 +1,18 @@
-ALLOW_HOST_LIST = "xxxxxxxxxxxxxxxxx"
 CLIENT_ID = "xxxxxxxxxxxxxxxxx"
 CLIENT_SECRET = "xxxxxxxxxxxxxxxxx"
 TENANT_ID = "xxxxxxxxxxxxxxxxx"
+ASSETS_MANIFESTS = `
+{
+  "xxxxxxxxxxxxxxxxx": {
+    "driveId": "xxxxxxxxxxxxxxxxx",
+    "accessKey": "xxxxxxxxxxxxxxxxx",
+    "allowedHosts": ["xxxxxxxxxxxxxxxxx"]
+  },
+  "xxxxxxxxxxxxxxxxx": {
+    "driveId": "xxxxxxxxxxxxxxxxx",
+    "accessKey": "xxxxxxxxxxxxxxxxx",
+    "allowedHosts": ["xxxxxxxxxxxxxxxxx"]
+  },
+  // ...
+}
+`

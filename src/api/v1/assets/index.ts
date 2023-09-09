@@ -1,28 +1,50 @@
 import { zValidator } from "@hono/zod-validator";
 import { cors } from "hono/cors";
-import { createHono } from "lib/constant";
+import { createHono, getAssetManifests } from "lib/constant";
 import { getOrRefreshCredential } from "lib/credential";
-import { Drive, driveErrHandler } from "lib/drive_item";
-import { assetScope } from "lib/types/assets";
+import { Drive, driveErrHandler } from "lib/drive";
+import { bearerAuth } from "hono/bearer-auth";
 import { z } from "zod";
 
 export const assets = createHono()
-  .use("/*", async (ctx, next) =>
-    cors({
-      origin: ctx.env.ALLOW_HOST_LIST.split(","),
-      exposeHeaders: ["GET"],
-    })(ctx, next)
-  )
-
-  .use(async (ctx, next) => {
+  .use("/:key/*", async (ctx, next) => {
     console.log("assets middleware");
     ctx.set("accessToken", await getOrRefreshCredential(ctx.env));
 
     await next();
   })
 
+  .use("/:key/*", async (ctx, next) => {
+    console.log("manifest middleware");
+
+    const key = ctx.req.param("key");
+    const manifest = getAssetManifests(ctx.env)[key];
+
+    if (manifest == null) return await ctx.notFound();
+    ctx.set("assetManifest", manifest);
+
+    return await cors({
+      origin: manifest.allowedHosts,
+      exposeHeaders: ["GET"],
+    })(ctx, next);
+  })
+
+  // secure guard
+  .use("/:key/*", async (ctx, next) => {
+    console.log("secure guard");
+
+    const manifest = ctx.get("assetManifest");
+    const { allowedHosts, accessKey } = manifest;
+
+    if (!allowedHosts.includes(ctx.req.header("referer") ?? "")) {
+      return ctx.body(null, 403);
+    }
+
+    return await bearerAuth({ token: accessKey })(ctx, next);
+  })
+
   .get(
-    "/:scope/item",
+    "/:key/item",
     zValidator(
       "query",
       z.object({
@@ -30,10 +52,13 @@ export const assets = createHono()
       })
     ),
     async (ctx) => {
+      console.log("item");
+
+      const manifest = ctx.get("assetManifest");
       const accessToken = ctx.get("accessToken");
       const { filePath } = ctx.req.valid("query");
-      const scope = assetScope.parse(ctx.req.param("scope"));
-      const drive = new Drive(scope, accessToken, ctx.env);
+
+      const drive = new Drive(accessToken, manifest);
 
       try {
         const item = await drive.getItem(filePath);
@@ -45,7 +70,7 @@ export const assets = createHono()
   )
 
   .get(
-    "/:scope/children",
+    "/:key/children",
     zValidator(
       "query",
       z.object({
@@ -53,10 +78,11 @@ export const assets = createHono()
       })
     ),
     async (ctx) => {
+      const manifest = ctx.get("assetManifest");
       const accessToken = ctx.get("accessToken");
       const { dirPath } = ctx.req.valid("query");
-      const scope = assetScope.parse(ctx.req.param("scope"));
-      const drive = new Drive(scope, accessToken, ctx.env);
+
+      const drive = new Drive(accessToken, manifest);
 
       try {
         const [item, children] = await Promise.all([

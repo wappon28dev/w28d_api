@@ -6,5 +6,6 @@ const app = createHono();
 const route = app
   .get("/", async (ctx) => ctx.jsonT("Hello World!"))
   .route("/v1", v1);
+
 export type AppType = typeof route;
 export default app;
