@@ -1,6 +1,6 @@
-CLIENT_ID = "xxxxxxxxxxxxxxxxx"
-CLIENT_SECRET = "xxxxxxxxxxxxxxxxx"
-TENANT_ID = "xxxxxxxxxxxxxxxxx"
+ASSETS_CLIENT_ID = "xxxxxxxxxxxxxxxxx"
+ASSETS_CLIENT_SECRET = "xxxxxxxxxxxxxxxxx"
+ASSETS_TENANT_ID = "xxxxxxxxxxxxxxxxx"
 ASSETS_MANIFESTS = `
 {
   "xxxxxxxxxxxxxxxxx": {

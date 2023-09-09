@@ -8,13 +8,13 @@ export async function requestAccessToken(
   env: ENV
 ): Promise<z.infer<(typeof resValidator)["token"]>> {
   console.log("Requesting access token...");
-  const tokenEndpoint = `https://login.microsoftonline.com/${env.TENANT_ID}/oauth2/v2.0/token`;
+  const tokenEndpoint = `https://login.microsoftonline.com/${env.ASSETS_TENANT_ID}/oauth2/v2.0/token`;
 
   const body: z.infer<(typeof reqValidator)["token"]> = {
-    client_id: env.CLIENT_ID,
+    client_id: env.ASSETS_CLIENT_ID,
     scope: "https://graph.microsoft.com/.default",
     grant_type: "client_credentials",
-    client_secret: env.CLIENT_SECRET,
+    client_secret: env.ASSETS_CLIENT_SECRET,
   };
 
   return await fetchRequest(

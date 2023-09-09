@@ -4,9 +4,9 @@ import { assetManifestsScheme, type AssetManifests } from "./types/assets";
 
 export type ENV = {
   SHAREPOINT_ACCESS_TOKEN: KVNamespace;
-  CLIENT_ID: string;
-  CLIENT_SECRET: string;
-  TENANT_ID: string;
+  ASSETS_CLIENT_ID: string;
+  ASSETS_CLIENT_SECRET: string;
+  ASSETS_TENANT_ID: string;
   ASSETS_MANIFESTS: string;
 };
 
