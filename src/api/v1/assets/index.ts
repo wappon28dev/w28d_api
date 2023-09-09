@@ -1,10 +1,11 @@
 import { zValidator } from "@hono/zod-validator";
 import { cors } from "hono/cors";
-import { createHono, getAssetManifests } from "lib/constant";
+import { createHono, getAssetsManifests } from "lib/constant";
 import { getOrRefreshCredential } from "lib/credential";
 import { Drive, driveErrHandler } from "lib/drive";
 import { bearerAuth } from "hono/bearer-auth";
 import { z } from "zod";
+import { HTTPException } from "hono/http-exception";
 
 export const assets = createHono()
   .use("/:key/*", async (ctx, next) => {
@@ -18,7 +19,7 @@ export const assets = createHono()
     console.log("manifest middleware");
 
     const key = ctx.req.param("key");
-    const manifest = getAssetManifests(ctx.env)[key];
+    const manifest = getAssetsManifests(ctx.env)[key];
 
     if (manifest == null) return await ctx.notFound();
     ctx.set("assetManifest", manifest);
@@ -36,8 +37,14 @@ export const assets = createHono()
     const manifest = ctx.get("assetManifest");
     const { allowedHosts, accessKey } = manifest;
 
-    if (!allowedHosts.includes(ctx.req.header("referer") ?? "")) {
-      return ctx.body(null, 403);
+    const referer = ctx.req.header("referer");
+
+    if (referer == null) {
+      throw new HTTPException(400, { message: "referer header is required" });
+    }
+
+    if (allowedHosts.includes(referer) == null) {
+      throw new HTTPException(403);
     }
 
     return await bearerAuth({ token: accessKey })(ctx, next);

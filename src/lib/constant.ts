@@ -30,5 +30,5 @@ export function createHono() {
 export const getApiEndpoint = (path: string[]): string =>
   new URL(`https://graph.microsoft.com/v1.0/${path.join("/")}`).toString();
 
-export const getAssetManifests = (env: ENV): AssetManifests =>
+export const getAssetsManifests = (env: ENV): AssetManifests =>
   assetManifestsScheme.parse(JSON.parse(env.ASSETS_MANIFESTS));
