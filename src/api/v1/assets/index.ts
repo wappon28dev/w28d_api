@@ -7,13 +7,11 @@ import { assetScope } from "lib/types/assets";
 import { z } from "zod";
 
 export const assets = createHono()
-  .use(
-    "/*",
-    async (ctx, next) =>
-      await cors({
-        origin: ctx.env.ALLOW_HOST_LIST.split(","),
-        exposeHeaders: ["GET"],
-      })(ctx, next)
+  .use("/*", async (ctx, next) =>
+    cors({
+      origin: ctx.env.ALLOW_HOST_LIST.split(","),
+      exposeHeaders: ["GET"],
+    })(ctx, next)
   )
 
   .use(async (ctx, next) => {
@@ -35,7 +33,7 @@ export const assets = createHono()
       const accessToken = ctx.get("accessToken");
       const { filePath } = ctx.req.valid("query");
       const scope = assetScope.parse(ctx.req.param("scope"));
-      const drive = new Drive(scope, accessToken);
+      const drive = new Drive(scope, accessToken, ctx.env);
 
       try {
         const item = await drive.getItem(filePath);
@@ -58,7 +56,7 @@ export const assets = createHono()
       const accessToken = ctx.get("accessToken");
       const { dirPath } = ctx.req.valid("query");
       const scope = assetScope.parse(ctx.req.param("scope"));
-      const drive = new Drive(scope, accessToken);
+      const drive = new Drive(scope, accessToken, ctx.env);
 
       try {
         const [item, children] = await Promise.all([

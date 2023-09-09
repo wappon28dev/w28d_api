@@ -1,4 +1,4 @@
-import { NetworkError, ResponseNotOkError } from "./constant";
+import { NetworkError, ResponseNotOkError } from "./error";
 
 type FetchArgs = Parameters<typeof fetch>;
 

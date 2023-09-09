@@ -1,14 +1,17 @@
 import { type z } from "zod";
-import { ResponseNotOkError, getApiEndpoint, type ENV, type valueOf } from "./constant";
+import { getApiEndpoint, type ENV, type ValueOf } from "./constant";
 import { fetchRequest } from "./request";
 import { type resValidator } from "./types/res_req";
+import { ResponseNotOkError } from "./error";
 
-const getDriveId = (env: ENV): {
+const getDriveId = (
+  env: ENV
+): {
   public: string;
   protected: string;
 } => ({
   public: env.DRIVE_ID_PUBLIC,
-  protected: env.DRIVE_ID_PROTECTED
+  protected: env.DRIVE_ID_PROTECTED,
 });
 
 export function driveErrHandler(err: unknown): Response {
@@ -23,11 +26,11 @@ export function driveErrHandler(err: unknown): Response {
     });
   }
 
-  throw new Error("Unknown error" + String(err));
+  throw new Error(`Unknown error${String(err)}`);
 }
 
 export class Drive {
-  private readonly id: valueOf<ReturnType<typeof getDriveId>>;
+  private readonly id: ValueOf<ReturnType<typeof getDriveId>>;
 
   constructor(
     public key: keyof ReturnType<typeof getDriveId>,
@@ -44,7 +47,7 @@ export class Drive {
       `/drives/${this.id}/root:/${fileOrDirPath}:/listItem?expand=driveItem`
     );
 
-    return await fetchRequest(
+    return fetchRequest(
       [
         endpoint,
         {
@@ -66,7 +69,7 @@ export class Drive {
       `/drives/${this.id}/root:/${dirPath}:/children`
     );
 
-    return await fetchRequest(
+    return fetchRequest(
       [
         endpoint,
         {

@@ -1,9 +1,9 @@
 import { type z } from "zod";
-import { type valueOf } from "./constant";
+import { type ValueOf } from "./constant";
 import { kvEntries } from "./types/kv";
 
 export class KV {
-  private readonly entry: valueOf<typeof kvEntries>;
+  private readonly entry: ValueOf<typeof kvEntries>;
 
   constructor(
     public kv: KVNamespace,
@@ -17,7 +17,7 @@ export class KV {
   > {
     console.log(`GET ${this.entry.key}`);
     const data = await this.kv.get(this.entry.key);
-    if (data == null) return;
+    if (data == null) return undefined;
     return this.entry.value.parse(data);
   }
 

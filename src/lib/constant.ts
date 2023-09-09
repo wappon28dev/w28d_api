@@ -16,11 +16,11 @@ export type Variables = {
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type toZod<T extends Record<string, any>> = {
+export type ToZod<T extends Record<string, any>> = {
   [K in keyof T]-?: z.ZodType<T[K]>;
 };
 
-export type valueOf<T> = T[keyof T];
+export type ValueOf<T> = T[keyof T];
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export function createHono() {
@@ -28,20 +28,4 @@ export function createHono() {
 }
 
 export const getApiEndpoint = (path: string): string =>
-  "https://graph.microsoft.com/v1.0" + path;
-
-export class NetworkError extends Error {
-  constructor(public reason: string) {
-    super(JSON.stringify({ message: "Network Error", reason }));
-  }
-}
-
-export class ResponseNotOkError extends Error {
-  constructor(
-    message: string,
-    public reason: string,
-    public status: number
-  ) {
-    super(JSON.stringify({ message, reason, status }));
-  }
-}
+  `https://graph.microsoft.com/v1.0${path}`;

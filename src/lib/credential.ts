@@ -17,7 +17,7 @@ export async function requestAccessToken(
     client_secret: env.CLIENT_SECRET,
   };
 
-  return await fetchRequest(
+  return fetchRequest(
     [
       tokenEndpoint,
       {
