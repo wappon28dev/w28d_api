@@ -6,6 +6,7 @@ import { Drive, driveErrHandler } from "lib/drive";
 import { bearerAuth } from "hono/bearer-auth";
 import { z } from "zod";
 import { HTTPException } from "hono/http-exception";
+import { sendAnalyticsEventAssets } from "lib/analytics";
 
 export const assets = createHono()
   .use("/:key/*", async (ctx, next) => {
@@ -67,6 +68,15 @@ export const assets = createHono()
 
       const drive = new Drive(accessToken, manifest);
 
+      await sendAnalyticsEventAssets(ctx.env, ctx.req.header("referer"), {
+        name: "assets",
+        params: {
+          key: ctx.req.param("key"),
+          operation: "item",
+          fileOrDirPath: filePath,
+        },
+      });
+
       try {
         const item = await drive.getItem(filePath);
         return ctx.jsonT({ item });
@@ -88,6 +98,15 @@ export const assets = createHono()
       const manifest = ctx.get("assetManifest");
       const accessToken = ctx.get("accessToken");
       const { dirPath } = ctx.req.valid("query");
+
+      await sendAnalyticsEventAssets(ctx.env, ctx.req.header("referer"), {
+        name: "assets",
+        params: {
+          key: ctx.req.param("key"),
+          operation: "children",
+          fileOrDirPath: dirPath,
+        },
+      });
 
       const drive = new Drive(accessToken, manifest);
 

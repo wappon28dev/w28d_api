@@ -6,13 +6,18 @@ ASSETS_MANIFESTS = `
   "xxxxxxxxxxxxxxxxx": {
     "driveId": "xxxxxxxxxxxxxxxxx",
     "accessKey": "xxxxxxxxxxxxxxxxx",
-    "allowedHosts": ["xxxxxxxxxxxxxxxxx"]
+    "allowedHosts": ["xxxxxxxxxxxxxxxxx"],
+    "distPath": []
   },
   "xxxxxxxxxxxxxxxxx": {
     "driveId": "xxxxxxxxxxxxxxxxx",
     "accessKey": "xxxxxxxxxxxxxxxxx",
-    "allowedHosts": ["xxxxxxxxxxxxxxxxx"]
+    "allowedHosts": ["xxxxxxxxxxxxxxxxx"],
+    "distPath": []
   },
   // ...
 }
 `
+ANALYTICS_MEASUREMENT_ID = "xxxxxxxxxxxxxxxxx"
+ANALYTICS_API_SECRET = "xxxxxxxxxxxxxxxxx"
+IS_PROD = false

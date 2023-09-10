@@ -8,6 +8,9 @@ export type ENV = {
   ASSETS_CLIENT_SECRET: string;
   ASSETS_TENANT_ID: string;
   ASSETS_MANIFESTS: string;
+  ANALYTICS_MEASUREMENT_ID: string;
+  ANALYTICS_API_SECRET: string;
+  IS_PROD: boolean;
 };
 
 export type Variables = {
