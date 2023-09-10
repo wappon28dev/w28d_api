@@ -43,7 +43,7 @@ export const assets = createHono()
       throw new HTTPException(400, { message: "referer header is required" });
     }
 
-    if (allowedHosts.includes(referer) == null) {
+    if (referer in allowedHosts) {
       throw new HTTPException(403);
     }
 
