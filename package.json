@@ -16,7 +16,7 @@
     "@types/jsonwebtoken": "^9.0.2",
     "axios": "^1.6.0",
     "crypto-js": "^4.2.0",
-    "hono": "^3.5.8",
+    "hono": "^3.11.7",
     "zod": "^3.22.3"
   },
   "devDependencies": {
