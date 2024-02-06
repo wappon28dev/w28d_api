@@ -120,4 +120,38 @@ export const assets = createHono()
         return driveErrHandler(err);
       }
     }
+  )
+
+  .post(
+    "/:key/",
+    zValidator(
+      "query",
+      z.object({
+        dirPath: z.string(),
+        fileName: z.string(),
+      })
+    ),
+    async (ctx) => {
+      const manifest = ctx.get("assetManifest");
+      const accessToken = ctx.get("accessToken");
+      const { dirPath, fileName } = ctx.req.valid("query");
+      const body = await ctx.req.parseBody();
+
+      await sendAnalyticsEventAssets(ctx.env, ctx.req.header("referer"), {
+        name: "assets",
+        params: {
+          key: ctx.req.param("key"),
+          operation: "children",
+          fileOrDirPath: dirPath,
+        },
+      });
+
+      const drive = new Drive(accessToken, manifest);
+      try {
+        const item = await drive.createItem(dirPath, body, fileName);
+        return ctx.json({ item });
+      } catch (err) {
+        return driveErrHandler(err);
+      }
+    }
   );

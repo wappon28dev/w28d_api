@@ -86,4 +86,39 @@ export class Drive {
       "driveChildren request failed"
     );
   }
+
+  public async createItem(
+    dirPath: string,
+    file: File,
+    fileName: string
+  ): Promise<z.infer<(typeof resValidator)["driveChildren"]>> {
+    const distDirPath = [
+      ...this.manifest.distPath,
+      ...dirPath.split("/"),
+      fileName,
+    ].join("/");
+    const endpoint = getApiEndpoint([
+      "drives",
+      this.manifest.driveId,
+      "items",
+      "root:",
+      `${distDirPath}:`,
+      "children",
+    ]);
+
+    return await fetchRequest(
+      [
+        endpoint,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "text/plain",
+            Authorization: `Bearer ${this.accessToken}`,
+          },
+          body: file,
+        },
+      ],
+      "uploadItem request failed"
+    );
+  }
 }
