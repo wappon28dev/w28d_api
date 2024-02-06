@@ -20,13 +20,11 @@ jobs:
         id: sha
         uses: pr-mpt/actions-commit-hash@v2
 
-      - name: 🔨 Prepare Node environment
-        uses: actions/setup-node@v3
-        with:
-          node-version: 19
+      - name: 🔨 Prepare Bun environment
+        uses: oven-sh/setup-bun@v1
 
       - name: 🎉 Install project dependencies
-        run: yarn
+        run: bun i
 
       - name: 🚀 Deploy workers
         uses: cloudflare/wrangler-action@2.0.0
