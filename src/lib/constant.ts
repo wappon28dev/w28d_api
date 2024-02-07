@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { type z } from "zod";
+import { type Client } from "@microsoft/microsoft-graph-client";
 import { assetManifestsScheme, type AssetManifests } from "./types/assets";
 
 export type ENV = {
@@ -14,7 +15,7 @@ export type ENV = {
 };
 
 export type Variables = {
-  accessToken: string;
+  graphClient: Client;
   assetManifest: AssetManifests[string];
 };
 

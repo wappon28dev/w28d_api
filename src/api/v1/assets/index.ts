@@ -2,27 +2,21 @@ import { zValidator } from "@hono/zod-validator";
 import { cors } from "hono/cors";
 import { createHono, getAssetsManifests } from "lib/constant";
 import { getOrRefreshCredential } from "lib/credential";
-import { Drive, driveErrHandler } from "lib/drive";
+import { Drive } from "lib/drive";
 import { bearerAuth } from "hono/bearer-auth";
 import { z } from "zod";
 import { HTTPException } from "hono/http-exception";
 import { sendAnalyticsEventAssets } from "lib/analytics";
+import { Client, LargeFileUploadTask } from "@microsoft/microsoft-graph-client";
 
 export const assets = createHono()
-  .use("/:key/*", async (ctx, next) => {
-    console.log("assets middleware");
-    ctx.set("accessToken", await getOrRefreshCredential(ctx.env));
-
-    await next();
-  })
-
   .use("/:key/*", async (ctx, next) => {
     console.log("manifest middleware");
 
     const key = ctx.req.param("key");
     const manifest = getAssetsManifests(ctx.env)[key];
 
-    if (manifest == null) return await ctx.notFound();
+    if (manifest == null) return ctx.notFound();
     ctx.set("assetManifest", manifest);
 
     return await cors({
@@ -32,10 +26,10 @@ export const assets = createHono()
   })
 
   // secure guard
-  .use("/:key/*", async (ctx, next) => {
+  .use("*", async (ctx, next) => {
     console.log("secure guard");
 
-    const manifest = ctx.get("assetManifest");
+    const manifest = ctx.var.assetManifest;
     const { allowedHosts, accessKey } = manifest;
 
     const referer = ctx.req.header("referer");
@@ -44,11 +38,24 @@ export const assets = createHono()
       throw new HTTPException(400, { message: "referer header is required" });
     }
 
-    if (referer in allowedHosts) {
+    if (!allowedHosts.some((host) => referer.startsWith(host))) {
+      console.log(allowedHosts, referer);
       throw new HTTPException(403);
     }
 
     return await bearerAuth({ token: accessKey })(ctx, next);
+  })
+
+  .use("/:key/*", async (ctx, next) => {
+    console.log("assets middleware");
+    const graphClient = Client.initWithMiddleware({
+      authProvider: {
+        getAccessToken: async () => getOrRefreshCredential(ctx.env),
+      },
+    });
+    ctx.set("graphClient", graphClient);
+
+    await next();
   })
 
   .get(
@@ -60,13 +67,10 @@ export const assets = createHono()
       })
     ),
     async (ctx) => {
-      console.log("item");
-
-      const manifest = ctx.get("assetManifest");
-      const accessToken = ctx.get("accessToken");
+      const { graphClient: client, assetManifest: manifest } = ctx.var;
       const { filePath } = ctx.req.valid("query");
 
-      const drive = new Drive(accessToken, manifest);
+      const drive = new Drive(client, manifest);
 
       await sendAnalyticsEventAssets(ctx.env, ctx.req.header("referer"), {
         name: "assets",
@@ -77,12 +81,8 @@ export const assets = createHono()
         },
       });
 
-      try {
-        const item = await drive.getItem(filePath);
-        return ctx.jsonT({ item });
-      } catch (err) {
-        return driveErrHandler(err);
-      }
+      const item = await drive.getItem(filePath);
+      return ctx.json({ item });
     }
   )
 
@@ -95,8 +95,7 @@ export const assets = createHono()
       })
     ),
     async (ctx) => {
-      const manifest = ctx.get("assetManifest");
-      const accessToken = ctx.get("accessToken");
+      const { graphClient: client, assetManifest: manifest } = ctx.var;
       const { dirPath } = ctx.req.valid("query");
 
       await sendAnalyticsEventAssets(ctx.env, ctx.req.header("referer"), {
@@ -108,50 +107,41 @@ export const assets = createHono()
         },
       });
 
-      const drive = new Drive(accessToken, manifest);
+      const drive = new Drive(client, manifest);
 
-      try {
-        const [item, children] = await Promise.all([
-          drive.getItem(dirPath),
-          drive.getChildren(dirPath),
-        ]);
-        return ctx.jsonT({ item, children });
-      } catch (err) {
-        return driveErrHandler(err);
-      }
+      const [item, children] = await Promise.all([
+        drive.getItem(dirPath),
+        drive.getChildren(dirPath),
+      ]);
+      return ctx.json({ item, children });
     }
   )
 
   .post(
-    "/:key/",
+    "/:key/item",
     zValidator(
       "query",
       z.object({
-        dirPath: z.string(),
-        fileName: z.string(),
+        filePath: z.string(),
       })
     ),
     async (ctx) => {
-      const manifest = ctx.get("assetManifest");
-      const accessToken = ctx.get("accessToken");
-      const { dirPath, fileName } = ctx.req.valid("query");
-      const body = await ctx.req.parseBody();
+      const { graphClient: client, assetManifest: manifest } = ctx.var;
+      const { filePath } = ctx.req.valid("query");
 
-      await sendAnalyticsEventAssets(ctx.env, ctx.req.header("referer"), {
-        name: "assets",
-        params: {
-          key: ctx.req.param("key"),
-          operation: "children",
-          fileOrDirPath: dirPath,
-        },
-      });
+      const uploadSession = await LargeFileUploadTask.createUploadSession(
+        client,
+        [
+          "drives",
+          manifest.driveId,
+          "root:",
+          manifest.distPath,
+          `${filePath}:`,
+          "createUploadSession",
+        ].join("/"),
+        {}
+      );
 
-      const drive = new Drive(accessToken, manifest);
-      try {
-        const item = await drive.createItem(dirPath, body, fileName);
-        return ctx.json({ item });
-      } catch (err) {
-        return driveErrHandler(err);
-      }
+      return ctx.json(uploadSession);
     }
   );

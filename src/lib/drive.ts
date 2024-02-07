@@ -1,124 +1,65 @@
 import { type z } from "zod";
-import { getApiEndpoint } from "./constant";
-import { fetchRequest } from "./request";
-import { type resValidator } from "./types/res_req";
-import { ResponseNotOkError } from "./error";
-import { type AssetManifests } from "./types/assets";
-
-export function driveErrHandler(err: unknown): Response {
-  if (err instanceof Error) {
-    if (err instanceof ResponseNotOkError) {
-      return new Response(JSON.stringify(err), {
-        status: err.status,
-      });
-    }
-    return new Response(JSON.stringify(err), {
-      status: 500,
-    });
-  }
-
-  throw new Error(`Unknown error${String(err)}`);
-}
+import {
+  LargeFileUploadTask,
+  type Client,
+  type LargeFileUploadSession,
+} from "@microsoft/microsoft-graph-client";
+import { type resValidator } from "lib/types/res_req";
+import { type AssetManifests } from "lib/types/assets";
+import { graphErrorHandler } from "./error";
 
 export class Drive {
   constructor(
-    private readonly accessToken: string,
+    private readonly client: Client,
     private readonly manifest: AssetManifests[string]
   ) {}
 
   public async getItem(
     fileOrDirPath: string
   ): Promise<z.infer<(typeof resValidator)["listItem"]>> {
-    const distFileOrDirPath = [
-      ...this.manifest.distPath,
-      ...fileOrDirPath.split("/"),
-    ].join("/");
-
-    const endpoint = getApiEndpoint([
+    const path = [
       "drives",
       this.manifest.driveId,
       "root:",
-      `${distFileOrDirPath}:`,
+      this.manifest.distPath,
+      `${fileOrDirPath}:`,
       "listItem?expand=driveItem",
-    ]);
+    ].join("/");
 
-    return await fetchRequest(
-      [
-        endpoint,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${this.accessToken}`,
-          },
-        },
-      ],
-      "driveItem request failed"
-    );
+    return await this.client.api(path).get().catch(graphErrorHandler);
   }
 
   public async getChildren(
     dirPath: string
   ): Promise<z.infer<(typeof resValidator)["driveChildren"]>> {
-    const distDirPath = [...this.manifest.distPath, ...dirPath.split("/")].join(
-      "/"
-    );
-
-    const endpoint = getApiEndpoint([
+    const path = [
       "drives",
       this.manifest.driveId,
       "root:",
-      `${distDirPath}:`,
+      this.manifest.distPath,
+      `${dirPath}:`,
       "children",
-    ]);
+    ].join("/");
 
-    return await fetchRequest(
-      [
-        endpoint,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${this.accessToken}`,
-          },
-        },
-      ],
-      "driveChildren request failed"
-    );
+    return await this.client.api(path).get().catch(graphErrorHandler);
   }
 
-  public async createItem(
-    dirPath: string,
-    file: File,
-    fileName: string
-  ): Promise<z.infer<(typeof resValidator)["driveChildren"]>> {
-    const distDirPath = [
-      ...this.manifest.distPath,
-      ...dirPath.split("/"),
-      fileName,
-    ].join("/");
-    const endpoint = getApiEndpoint([
+  public async createUploadSession(
+    filePath: string
+  ): Promise<LargeFileUploadSession> {
+    const url = [
       "drives",
       this.manifest.driveId,
-      "items",
       "root:",
-      `${distDirPath}:`,
-      "children",
-    ]);
+      this.manifest.distPath,
+      `${filePath}:`,
+      "createUploadSession",
+    ].join("/");
 
-    return await fetchRequest(
-      [
-        endpoint,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "text/plain",
-            Authorization: `Bearer ${this.accessToken}`,
-          },
-          body: file,
-        },
-      ],
-      "uploadItem request failed"
-    );
+    return await LargeFileUploadTask.createUploadSession(
+      this.client,
+      url,
+      {}
+    ).catch(graphErrorHandler);
   }
 }
