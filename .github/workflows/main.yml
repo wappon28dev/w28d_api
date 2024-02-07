@@ -34,7 +34,11 @@ jobs:
             ASSETS_CLIENT_ID
             ASSETS_CLIENT_SECRET
             ASSETS_TENANT_ID
-            ASSETS_MANIFESTS
+            ASSETS_DOWNLOAD_MANIFESTS
+            ASSETS_UPLOAD_MANIFESTS
+            ANALYTICS_MEASUREMENT_ID
+            ANALYTICS_API_SECRET
+            IS_PROD
         env:
           ASSETS_CLIENT_ID: ${{ secrets.ASSETS_CLIENT_ID }}
           ASSETS_CLIENT_SECRET: ${{ secrets.ASSETS_CLIENT_SECRET }}
