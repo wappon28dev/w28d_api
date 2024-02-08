@@ -51,7 +51,7 @@ export class Drive {
       "drives",
       this.manifest.driveId,
       "root:",
-      this.manifest.distPath,
+      this.manifest.distPath.join("/"),
       `${filePath}:`,
       "createUploadSession",
     ].join("/");

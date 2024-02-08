@@ -3,7 +3,6 @@ import { type HonoType } from "lib/constant";
 import { Drive } from "lib/drive";
 import { z } from "zod";
 import { sendAnalyticsEventAssets } from "lib/analytics";
-import { LargeFileUploadTask } from "@microsoft/microsoft-graph-client";
 import {
   authGuard,
   configureCors,
@@ -88,18 +87,8 @@ export const assets = new Hono<HonoType>()
       const { graphClient: client, assetManifest: manifest } = ctx.var;
       const { filePath } = ctx.req.valid("query");
 
-      const uploadSession = await LargeFileUploadTask.createUploadSession(
-        client,
-        [
-          "drives",
-          manifest.driveId,
-          "root:",
-          manifest.distPath,
-          `${filePath}:`,
-          "createUploadSession",
-        ].join("/"),
-        {}
-      );
+      const drive = new Drive(client, manifest);
+      const uploadSession = await drive.createUploadSession(filePath);
 
       return ctx.json(uploadSession);
     }
