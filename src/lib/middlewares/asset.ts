@@ -74,7 +74,6 @@ export const authGuard: MiddlewareHandler<HonoType> = async (ctx, next) => {
   }
 
   if (!allowedHosts.some((host) => referer.startsWith(host))) {
-    console.log(allowedHosts, referer);
     throw new HTTPException(403);
   }
 
