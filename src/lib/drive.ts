@@ -15,16 +15,16 @@ export class Drive {
     private readonly manifest: AssetManifests[string]
   ) {}
 
-  static joinPath(...path: string[]): string {
-    return (
-      path
-        .filter((p) => p !== "")
-        .join("/")
-        // 複数の `/` を 1 つにまとめる
-        .replace(/\/+/g, "/")
-        // 末尾の `/` を削除
-        .replace(/\/$/, "")
-    );
+  static joinPath(path: string[], needTrailSlash = false): string {
+    const joinedPath = path
+      .filter((p) => p !== "")
+      .join("/")
+      // 複数の `/` を 1 つにまとめる
+      .replace(/\/+/g, "/")
+      // 末尾の `/` を削除する
+      .replace(/\/$/, "");
+
+    return needTrailSlash ? `${joinedPath}/` : joinedPath;
   }
 
   public async getItem(
@@ -34,7 +34,7 @@ export class Drive {
       "drives",
       this.manifest.driveId,
       "root:",
-      `${Drive.joinPath(this.manifest.basePath, fileOrDirPath)}:`,
+      `${Drive.joinPath([this.manifest.basePath, fileOrDirPath])}:`,
       "listItem?expand=driveItem",
     ].join("/");
 
@@ -46,7 +46,7 @@ export class Drive {
       "drives",
       this.manifest.driveId,
       "root:",
-      `${Drive.joinPath(this.manifest.basePath, filePath)}:`,
+      `${Drive.joinPath([this.manifest.basePath, filePath])}:`,
       "?$select=content.downloadUrl",
     ].join("/");
 
@@ -70,7 +70,7 @@ export class Drive {
       "drives",
       this.manifest.driveId,
       "root:",
-      `${Drive.joinPath(this.manifest.basePath, dirPath)}:`,
+      `${Drive.joinPath([this.manifest.basePath, dirPath])}:`,
       "children",
     ].join("/");
 
@@ -103,7 +103,7 @@ export class Drive {
       "drives",
       this.manifest.driveId,
       "root:",
-      `${Drive.joinPath(this.manifest.basePath, filePath)}:`,
+      `${Drive.joinPath([this.manifest.basePath, filePath])}:`,
       "createUploadSession",
     ].join("/");
 
