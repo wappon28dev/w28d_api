@@ -1,13 +1,14 @@
 import { z } from "zod";
 
-export const assetManifestsScheme = z.record(
+export const zAssetManifests = z.record(
   z.string(), // key
   z.object({
     driveId: z.string(),
     allowedHosts: z.array(z.string()),
     accessKey: z.string(),
-    distPath: z.array(z.string()),
+    basePath: z.string(),
+    allowedMethods: z.array(z.string()),
   })
 );
 
-export type AssetManifests = z.infer<typeof assetManifestsScheme>;
+export type AssetManifests = z.infer<typeof zAssetManifests>;

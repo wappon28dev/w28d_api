@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    if: contains(github.event.head_commit.message, '[skip ci]') == false
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v3
@@ -34,8 +34,7 @@ jobs:
             ASSETS_CLIENT_ID
             ASSETS_CLIENT_SECRET
             ASSETS_TENANT_ID
-            ASSETS_DOWNLOAD_MANIFESTS
-            ASSETS_UPLOAD_MANIFESTS
+            ASSETS_MANIFESTS
             ANALYTICS_MEASUREMENT_ID
             ANALYTICS_API_SECRET
             IS_PROD
@@ -43,8 +42,7 @@ jobs:
           ASSETS_CLIENT_ID: ${{ secrets.ASSETS_CLIENT_ID }}
           ASSETS_CLIENT_SECRET: ${{ secrets.ASSETS_CLIENT_SECRET }}
           ASSETS_TENANT_ID: ${{ secrets.ASSETS_TENANT_ID }}
-          ASSETS_DOWNLOAD_MANIFESTS: ${{ secrets.ASSETS_DOWNLOAD_MANIFESTS }}
-          ASSETS_UPLOAD_MANIFESTS: ${{ secrets.ASSETS_UPLOAD_MANIFESTS }}
+          ASSETS_MANIFESTS: ${{ secrets.ASSETS_MANIFESTS }}
           ANALYTICS_MEASUREMENT_ID: ${{ secrets.ANALYTICS_MEASUREMENT_ID }}
           ANALYTICS_API_SECRET: ${{ secrets.ANALYTICS_API_SECRET }}
           IS_PROD: true

@@ -9,7 +9,7 @@ type AnalyticsEventAssets = {
   name: "assets";
   params: {
     key: string;
-    operation: "item" | "children";
+    operation: "item" | "itemRaw" | "children" | "childrenFlat";
     fileOrDirPath: string;
   };
 };

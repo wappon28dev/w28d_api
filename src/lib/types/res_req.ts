@@ -1,5 +1,17 @@
 import { z } from "zod";
 
+export type ListItem = {
+  value: Array<{
+    lastModifiedDateTime: string;
+    driveItem: {
+      "@microsoft.graph.downloadUrl": string;
+      name: string;
+      webUrl: string;
+      size: number;
+    };
+  }>;
+};
+
 export const reqValidator = {
   token: z.object({
     client_id: z.string(),
@@ -125,7 +137,16 @@ export const resValidator = {
   listItem,
 
   driveChildren: z.object({
-    "@odata.context": z.string(),
     value: z.array(driveItem),
   }),
+
+  getChildrenFlat: z.array(
+    z.object({
+      downloadUrl: z.string().url(),
+      name: z.string(),
+      filePath: z.string(),
+      size: z.number(),
+      lastModifiedDateTime: z.string(),
+    })
+  ),
 };

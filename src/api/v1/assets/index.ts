@@ -7,22 +7,22 @@ import {
   authGuard,
   configureCors,
   injectGraphClient,
-  injectReqMode,
 } from "lib/middlewares/asset";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
+import { resValidator } from "lib/types/res_req";
 
 export const assets = new Hono<HonoType>()
   // preflight
   .options("*", cors())
-  .use("/:key/*", injectReqMode, authGuard, configureCors, injectGraphClient)
+  .use("/:key/*", authGuard, configureCors, injectGraphClient)
 
   .get(
     "/:key/item",
     zValidator(
       "query",
       z.object({
-        filePath: z.string(),
+        filePath: z.string().min(1),
       })
     ),
     async (ctx) => {
@@ -45,11 +45,38 @@ export const assets = new Hono<HonoType>()
   )
 
   .get(
+    "/:key/item/raw",
+    zValidator(
+      "query",
+      z.object({
+        filePath: z.string().min(1),
+      })
+    ),
+    async (ctx) => {
+      const { graphClient: client, assetManifest: manifest } = ctx.var;
+      const { filePath } = ctx.req.valid("query");
+      const drive = new Drive(client, manifest);
+
+      await sendAnalyticsEventAssets(ctx.env, ctx.req.header("referer"), {
+        name: "assets",
+        params: {
+          key: ctx.req.param("key"),
+          operation: "itemRaw",
+          fileOrDirPath: filePath,
+        },
+      });
+
+      const downloadUrl = await drive.getFileDownloadUrl(filePath);
+      return ctx.redirect(downloadUrl, 303);
+    }
+  )
+
+  .get(
     "/:key/children",
     zValidator(
       "query",
       z.object({
-        dirPath: z.string(),
+        dirPath: z.string().min(1),
       })
     ),
     async (ctx) => {
@@ -75,12 +102,60 @@ export const assets = new Hono<HonoType>()
     }
   )
 
+  .get(
+    "/:key/children/flat",
+    zValidator(
+      "query",
+      z.object({
+        dirPath: z.string().min(1),
+      })
+    ),
+    async (ctx) => {
+      const { graphClient: client, assetManifest: manifest } = ctx.var;
+      const { dirPath } = ctx.req.valid("query");
+
+      await sendAnalyticsEventAssets(ctx.env, ctx.req.header("referer"), {
+        name: "assets",
+        params: {
+          key: ctx.req.param("key"),
+          operation: "childrenFlat",
+          fileOrDirPath: dirPath,
+        },
+      });
+
+      const drive = new Drive(client, manifest);
+
+      const childrenFlat = await drive.getChildrenFlat();
+      console.log({ childrenFlat });
+
+      const flat: z.infer<(typeof resValidator)["getChildrenFlat"]> =
+        childrenFlat.value
+          // `dirPath` にマッチするものだけを抽出
+          // TODO: API の `$filter` でフィルタリングするように修正する
+          .filter((item) =>
+            item.driveItem.webUrl.includes(
+              Drive.joinPath(manifest.basePath, dirPath)
+            )
+          )
+          .map((item) => ({
+            downloadUrl: item.driveItem["@microsoft.graph.downloadUrl"],
+            name: item.driveItem.name,
+            size: item.driveItem.size,
+            filePath: item.driveItem.webUrl.split(dirPath)[1],
+            lastModifiedDateTime: item.lastModifiedDateTime,
+          }));
+
+      const zFlat = resValidator.getChildrenFlat;
+      return ctx.json(zFlat.parse(flat));
+    }
+  )
+
   .post(
     "/:key/item",
     zValidator(
       "query",
       z.object({
-        filePath: z.string(),
+        filePath: z.string().min(1),
       })
     ),
     async (ctx) => {

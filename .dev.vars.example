@@ -7,30 +7,15 @@ ASSETS_DOWNLOAD_MANIFESTS = `
     "driveId": "xxxxxxxxxxxxxxxxx",
     "accessKey": "xxxxxxxxxxxxxxxxx",
     "allowedHosts": ["xxxxxxxxxxxxxxxxx"],
-    "distPath": []
+    "basePath": [],
+    "allowedMethods": []
   },
   "xxxxxxxxxxxxxxxxx": {
     "driveId": "xxxxxxxxxxxxxxxxx",
     "accessKey": "xxxxxxxxxxxxxxxxx",
     "allowedHosts": ["xxxxxxxxxxxxxxxxx"],
-    "distPath": []
-  },
-  // ...
-}
-`
-ASSETS_UPLOAD_MANIFESTS = `
-{
-  "xxxxxxxxxxxxxxxxx": {
-    "driveId": "xxxxxxxxxxxxxxxxx",
-    "accessKey": "xxxxxxxxxxxxxxxxx",
-    "allowedHosts": ["xxxxxxxxxxxxxxxxx"],
-    "distPath": []
-  },
-  "xxxxxxxxxxxxxxxxx": {
-    "driveId": "xxxxxxxxxxxxxxxxx",
-    "accessKey": "xxxxxxxxxxxxxxxxx",
-    "allowedHosts": ["xxxxxxxxxxxxxxxxx"],
-    "distPath": []
+    "basePath": [],
+    "allowedMethods": []
   },
   // ...
 }
