@@ -23,7 +23,7 @@ export const assets = new Hono<HonoType>()
       "query",
       z.object({
         filePath: z.string().min(1),
-      })
+      }),
     ),
     async (ctx) => {
       const { graphClient: client, assetManifest: manifest } = ctx.var;
@@ -41,7 +41,7 @@ export const assets = new Hono<HonoType>()
 
       const item = await drive.getItem(filePath);
       return ctx.json({ item });
-    }
+    },
   )
 
   .get(
@@ -50,7 +50,7 @@ export const assets = new Hono<HonoType>()
       "query",
       z.object({
         filePath: z.string().min(1),
-      })
+      }),
     ),
     async (ctx) => {
       const { graphClient: client, assetManifest: manifest } = ctx.var;
@@ -68,7 +68,7 @@ export const assets = new Hono<HonoType>()
 
       const downloadUrl = await drive.getFileDownloadUrl(filePath);
       return ctx.redirect(downloadUrl, 303);
-    }
+    },
   )
 
   .get(
@@ -77,7 +77,7 @@ export const assets = new Hono<HonoType>()
       "query",
       z.object({
         dirPath: z.string().min(1),
-      })
+      }),
     ),
     async (ctx) => {
       const { graphClient: client, assetManifest: manifest } = ctx.var;
@@ -99,7 +99,7 @@ export const assets = new Hono<HonoType>()
         drive.getChildren(dirPath),
       ]);
       return ctx.json({ item, children });
-    }
+    },
   )
 
   .get(
@@ -108,7 +108,7 @@ export const assets = new Hono<HonoType>()
       "query",
       z.object({
         dirPath: z.string().min(1),
-      })
+      }),
     ),
     async (ctx) => {
       const { graphClient: client, assetManifest: manifest } = ctx.var;
@@ -126,12 +126,11 @@ export const assets = new Hono<HonoType>()
       const drive = new Drive(client, manifest);
       const childrenFlat = await drive.getChildrenFlat();
       const joinedPath = Drive.joinPath([manifest.basePath, dirPath], true);
-
       const flat: z.infer<(typeof resValidator)["getChildrenFlat"]> =
         childrenFlat.value
           // `dirPath` にマッチするものだけを抽出
           // TODO: API の `$filter` でフィルタリングするように修正する
-          .filter((item) => item.driveItem.webUrl.includes(joinedPath))
+          .filter((item) => item.driveItem.webUrl.includes(manifest.baseUrl))
           .map((item) => {
             const filePath = Drive.joinPath([
               manifest.basePath,
@@ -149,7 +148,7 @@ export const assets = new Hono<HonoType>()
 
       const zFlat = resValidator.getChildrenFlat;
       return ctx.json(zFlat.parse(flat));
-    }
+    },
   )
 
   .post(
@@ -158,7 +157,7 @@ export const assets = new Hono<HonoType>()
       "query",
       z.object({
         filePath: z.string().min(1),
-      })
+      }),
     ),
     async (ctx) => {
       const { graphClient: client, assetManifest: manifest } = ctx.var;
@@ -168,5 +167,5 @@ export const assets = new Hono<HonoType>()
       const uploadSession = await drive.createUploadSession(filePath);
 
       return ctx.json(uploadSession);
-    }
+    },
   );

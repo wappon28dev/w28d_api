@@ -12,7 +12,7 @@ import { graphErrorHandler } from "./error";
 export class Drive {
   constructor(
     private readonly client: Client,
-    private readonly manifest: AssetManifests[string]
+    private readonly manifest: AssetManifests[string],
   ) {}
 
   static joinPath(path: string[], needTrailSlash = false): string {
@@ -28,7 +28,7 @@ export class Drive {
   }
 
   public async getItem(
-    fileOrDirPath: string
+    fileOrDirPath: string,
   ): Promise<z.infer<(typeof resValidator)["listItem"]>> {
     const path = [
       "drives",
@@ -64,7 +64,7 @@ export class Drive {
   }
 
   public async getChildren(
-    dirPath: string
+    dirPath: string,
   ): Promise<z.infer<(typeof resValidator)["driveChildren"]>> {
     const path = [
       "drives",
@@ -97,7 +97,7 @@ export class Drive {
   }
 
   public async createUploadSession(
-    filePath: string
+    filePath: string,
   ): Promise<LargeFileUploadSession> {
     const url = [
       "drives",
@@ -110,7 +110,7 @@ export class Drive {
     return await LargeFileUploadTask.createUploadSession(
       this.client,
       url,
-      {}
+      {},
     ).catch(graphErrorHandler);
   }
 }

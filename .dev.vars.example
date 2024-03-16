@@ -7,14 +7,16 @@ ASSETS_DOWNLOAD_MANIFESTS = `
     "driveId": "xxxxxxxxxxxxxxxxx",
     "accessKey": "xxxxxxxxxxxxxxxxx",
     "allowedHosts": ["xxxxxxxxxxxxxxxxx"],
-    "basePath": [],
+    "basePath": "xxxxxxxxxxxxxxxxx",
+    "baseUrl": "xxxxxxxxxxxxxxxxx",
     "allowedMethods": []
   },
   "xxxxxxxxxxxxxxxxx": {
     "driveId": "xxxxxxxxxxxxxxxxx",
     "accessKey": "xxxxxxxxxxxxxxxxx",
     "allowedHosts": ["xxxxxxxxxxxxxxxxx"],
-    "basePath": [],
+    "basePath": "xxxxxxxxxxxxxxxxx",
+    "baseUrl": "xxxxxxxxxxxxxxxxx",
     "allowedMethods": []
   },
   // ...
