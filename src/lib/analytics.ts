@@ -17,7 +17,7 @@ type AnalyticsEventAssets = {
 export async function sendAnalytics(
   env: ENV,
   clientId: string,
-  events: AnalyticsEvent[]
+  events: AnalyticsEvent[],
 ): Promise<void> {
   const baseUrl = `https://www.google-analytics.com/${
     env.IS_PROD ? "" : "debug/"
@@ -31,14 +31,14 @@ export async function sendAnalytics(
         client_id: clientId,
         events,
       }),
-    }
+    },
   );
 }
 
 export async function sendAnalyticsEventAssets(
   env: ENV,
   referer: string | undefined,
-  assetsEvent: AnalyticsEventAssets
+  assetsEvent: AnalyticsEventAssets,
 ): Promise<void> {
   await sendAnalytics(env, referer ?? "unknown", [assetsEvent]);
 }

@@ -7,7 +7,7 @@ export class KV {
 
   constructor(
     public kv: KVNamespace,
-    public key: keyof typeof kvEntries
+    public key: keyof typeof kvEntries,
   ) {
     this.entry = kvEntries[key];
   }
@@ -22,7 +22,7 @@ export class KV {
   }
 
   public async put(
-    value: z.infer<(typeof this.entry)["value"]>
+    value: z.infer<(typeof this.entry)["value"]>,
   ): Promise<void> {
     console.log(`PUT ${this.entry.key}`);
     await this.kv.put(this.entry.key, this.entry.value.parse(value), {

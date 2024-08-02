@@ -8,12 +8,12 @@ import { getOrRefreshCredential } from "lib/credential";
 
 export const injectGraphClient: MiddlewareHandler<HonoType> = async (
   ctx,
-  next
+  next,
 ) => {
   console.log("assets middleware");
   const graphClient = Client.initWithMiddleware({
     authProvider: {
-      getAccessToken: async () => getOrRefreshCredential(ctx.env),
+      getAccessToken: async () => await getOrRefreshCredential(ctx.env),
     },
   });
   ctx.set("graphClient", graphClient);
@@ -23,7 +23,7 @@ export const injectGraphClient: MiddlewareHandler<HonoType> = async (
 
 export const authGuard: MiddlewareHandler<HonoType, "/:key/*"> = async (
   ctx,
-  next
+  next,
 ) => {
   console.log("secure guard");
   const referer = ctx.req.header("referer");
@@ -32,7 +32,7 @@ export const authGuard: MiddlewareHandler<HonoType, "/:key/*"> = async (
 
   if (key == null) {
     throw new Error(
-      "`key` is missing! Maybe you forget that the path is in `/:key/*`"
+      "`key` is missing! Maybe you forget that the path is in `/:key/*`",
     );
   }
 

@@ -147,6 +147,6 @@ export const resValidator = {
       filePath: z.string(),
       size: z.number(),
       lastModifiedDateTime: z.string(),
-    })
+    }),
   ),
 };
