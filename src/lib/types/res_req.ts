@@ -4,6 +4,7 @@ export type ListItem = {
   value: Array<{
     lastModifiedDateTime: string;
     driveItem: {
+      "@odata.etag": string;
       "@microsoft.graph.downloadUrl": string;
       name: string;
       webUrl: string;
@@ -147,6 +148,8 @@ export const resValidator = {
       filePath: z.string(),
       size: z.number(),
       lastModifiedDateTime: z.string(),
+      eTag: z.string(),
+      version: z.string(),
     }),
   ),
 };

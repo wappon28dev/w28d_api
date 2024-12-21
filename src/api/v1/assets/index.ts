@@ -134,15 +134,23 @@ export const assets = new Hono<HonoType>()
               Drive.joinPath([manifest.baseUrl, dirPath]),
             ),
           )
-          .map((item) => ({
-            downloadUrl: item.driveItem["@microsoft.graph.downloadUrl"],
-            name: item.driveItem.name,
-            size: item.driveItem.size,
-            filePath: Drive.joinPath([
-              item.driveItem.webUrl.split(manifest.baseUrl)[1],
-            ]),
-            lastModifiedDateTime: item.lastModifiedDateTime,
-          }));
+          .map((item) => {
+            const [eTag, version] = item.driveItem["@odata.etag"]
+              .replace(/["{}]/g, "")
+              .split(",");
+
+            return {
+              downloadUrl: item.driveItem["@microsoft.graph.downloadUrl"],
+              name: item.driveItem.name,
+              size: item.driveItem.size,
+              filePath: Drive.joinPath([
+                item.driveItem.webUrl.split(manifest.baseUrl)[1],
+              ]),
+              lastModifiedDateTime: item.lastModifiedDateTime,
+              eTag,
+              version,
+            };
+          });
 
       const zFlat = resValidator.getChildrenFlat;
       return ctx.json(zFlat.parse(flat));
