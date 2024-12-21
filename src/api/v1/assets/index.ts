@@ -125,26 +125,24 @@ export const assets = new Hono<HonoType>()
 
       const drive = new Drive(client, manifest);
       const childrenFlat = await drive.getChildrenFlat();
-      const joinedPath = Drive.joinPath([manifest.basePath, dirPath], true);
       const flat: z.infer<(typeof resValidator)["getChildrenFlat"]> =
         childrenFlat.value
           // `dirPath` にマッチするものだけを抽出
           // TODO: API の `$filter` でフィルタリングするように修正する
-          .filter((item) => item.driveItem.webUrl.includes(manifest.baseUrl))
-          .map((item) => {
-            const filePath = Drive.joinPath([
-              manifest.basePath,
-              item.driveItem.webUrl.split(joinedPath)[1],
-            ]);
-
-            return {
-              downloadUrl: item.driveItem["@microsoft.graph.downloadUrl"],
-              name: item.driveItem.name,
-              size: item.driveItem.size,
-              filePath,
-              lastModifiedDateTime: item.lastModifiedDateTime,
-            };
-          });
+          .filter((item) =>
+            item.driveItem.webUrl.startsWith(
+              Drive.joinPath([manifest.baseUrl, dirPath]),
+            ),
+          )
+          .map((item) => ({
+            downloadUrl: item.driveItem["@microsoft.graph.downloadUrl"],
+            name: item.driveItem.name,
+            size: item.driveItem.size,
+            filePath: Drive.joinPath([
+              item.driveItem.webUrl.split(manifest.baseUrl)[1],
+            ]),
+            lastModifiedDateTime: item.lastModifiedDateTime,
+          }));
 
       const zFlat = resValidator.getChildrenFlat;
       return ctx.json(zFlat.parse(flat));

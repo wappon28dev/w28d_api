@@ -19,10 +19,12 @@ export class Drive {
     const joinedPath = path
       .filter((p) => p !== "")
       .join("/")
-      // 複数の `/` を 1 つにまとめる
-      .replace(/\/+/g, "/")
+      // URL Schema (://) の場合、複数の `/` を `//` にする
+      .replace(/(:\/\/)|(\/+)/g, (_, schema) => schema || "/")
       // 末尾の `/` を削除する
-      .replace(/\/$/, "");
+      .replace(/\/$/, "")
+      // 最初の `/` を削除する
+      .replace(/^\//, "");
 
     return needTrailSlash ? `${joinedPath}/` : joinedPath;
   }
@@ -83,7 +85,8 @@ export class Drive {
       // ref: https://stackoverflow.com/questions/45502275
       $expand: "driveItem($select=name,size,content.downloadUrl,webUrl)",
       $select: "lastModifiedDateTime,driveItem",
-      $filter: "contentType/name eq 'ドキュメント'",
+      $filter:
+        "contentType/name eq 'ドキュメント' or contentType/name eq 'Document'",
     };
 
     const path = [
